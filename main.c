@@ -1,8 +1,9 @@
 #include <stdio.h> // Importa a biblioteca stdio.h para que possamos utilizar as funções de entrada e saída padrão de dados
-
+#include "clientes.h"
 
 int main(){ // Função principal
-
+    funcao funcoes[] = {criar, deletar, listar, debitar, depositar, transferir}; // Definindo um array de funções que serão utilizadas no programa
+    Banco clientes[LIMITE_CLIENTES]; 
 
  int opcao; // Declarando variável do tipo inteiro para a escolha da opção do menu
     do{ // Início do loop do menu de opções até que o usuário escolha a opção de sair
