@@ -157,6 +157,78 @@ ERRO depositar(Banco clientes[], int *pos){
 } // Fechando função de depositar
 
 ERRO transferir(Banco clientes[], int *pos){ 
+  int cpf_origem; // Declarando variavel para armazenar o cpf do cliente que deseja transferir
+  char senha_origem[20]; // Declarando variavel para armazenar a senha do cliente que deseja transferir
+  int cpf_destino; // Declarando variavel para armazenar o cpf do cliente que receberá a transferência
+  float valor_transferencia; // Declarando variavel para armazenar o valor a ser transferido
+  float taxa; // Declarando variavel para armazenar a taxa de transferência
+  float limite; // Declarando variavel para armazenar o limite de transferência
+  int cpf_existe = 0; // Declarando variavel para verificar se o cpf existe
+
+  clearBuffer(); // Limpando o Buffer do teclado
+  printf("Digite o CPF da conta de origem: "); // Pedindo para o usuário nos informar o cpf da conta de origem
+  scanf("%d", &cpf_origem); // Lendo o cpf da conta de origem digitado pelo usuário
+  clearBuffer(); // Limpando o Buffer do teclado
+
+  printf("Digite a senha da conta de origem: "); // Pedindo para o usuário nos informar a senha da conta de origem
+  fgets(senha_origem, 20, stdin); // Lendo a senha da conta de origem digitada pelo usuário
+
+  clearBuffer(); // Limpando o Buffer do teclado 
+  printf("Digite o CPF da conta de destino: "); // Pedindo para o usuário nos informar o cpf da conta de destino
+  scanf("%d", &cpf_destino); // Lendo o cpf da conta de destino digitado pelo usuário
+  clearBuffer(); // Limpando o Buffer do teclado
+
+  printf("Digite o valor a ser transferido: "); // Pedindo para o usuário nos informar o valor a ser transferido
+  scanf("%f", &valor_transferencia); // Lendo o valor a ser transferido digitado pelo usuário
+  clearBuffer(); // Limpando o Buffer do teclado
+
+  for (int i = 0; i < *pos; i++) { // Loop para percorrer todos os clientes
+      if (strcmp(senha_origem, clientes[i].senha) == 0 && cpf_origem == clientes[i].cpf) // Verificando se a senha e o cpf de origem são válidos
+      {
+          cpf_existe += 1; // Atualizando a variável cpf_existe para indicar que o cpf de origem existe
+
+          if(clientes[i].conta == 1) // Verificando se a conta é comum
+          {
+              taxa = 0.05; // Atualizando a variável taxa para o valor de 5%
+              limite = -1000.00; // Atualizando a variável limite para o valor de -1000.00
+          }
+          else if(clientes[i].conta == 2) // Verificando se a conta é plus
+          {
+              taxa = 0.03; // Atualizando a variável taxa para o valor de 3%
+              limite = -5000.00; // Atualizando a variável limite para o valor de -5000.00
+          }
+          else { // Caso o tipo de conta não seja comum ou plus
+              printf("Tipo de conta inválido"); // Exibindo mensagem de erro para o usuário
+          }
+
+          for (int j = 0; j < *pos; j++) // Loop para percorrer todos os clientes
+          { 
+              if (cpf_destino == clientes[j].cpf) // Verificando se o cpf de destino é válido
+              {
+                  cpf_existe += 1; // Atualizando a variável cpf_existe para indicar que o cpf de destino existe
+
+                  if(clientes[i].valor - valor_transferencia >= limite) // Verificando se o saldo é suficiente para realizar o débito
+                  {
+                      clientes[i].valor -= (valor_transferencia * taxa) + valor_transferencia; // Atualizando o saldo do cliente com o valor debitado e a taxa de debito
+                      clientes[j].valor += valor_transferencia; // Atualizando o saldo do cliente com o valor depositado
+                      printf("Transferência realizada com sucesso!\n"); // Exibindo mensagem de sucesso para o usuário
+                  } else { // Caso o saldo não seja suficiente para realizar o débito
+                      printf("Saldo insuficiente para o débito.\n"); // Exibindo mensagem de erro para o usuário
+                  }
+
+              } 
+          }
+      } 
+  }
+
+  if (cpf_existe != 2) // Verificando se o cpf de origem e de destino existem
+  {
+      printf("Senha ou CPF incorreto\n"); // Exibindo mensagem de erro para o usuário
+      return CPF_OU_SENHA_INCORRETO; // Retornando código de erro
+  }
+
+  return OK; // Retornando código de sucesso
+  
 } // Fechando função de transferir
 
 ERRO salvar(Banco clientes[], int *pos){ 
