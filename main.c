@@ -2,7 +2,7 @@
 #include "clientes.h"
 
 int main(){ // Função principal
-  funcao funcoes[] = {criar, deletar, listar, debitar, depositar, transferir}; // Definindo um array de funções que serão utilizadas no programa
+  funcao funcoes[] = {criar, deletar, listar, debitar, depositar, extrato, transferir}; // Definindo um array de funções que serão utilizadas no programa
 
   Banco clientes[LIMITE_CLIENTES];  // Declarando um array de contatos (com limite de 255), onde cada contato possui uma estrutura com as informações de nome, sobrenome, email e telefone
   int pos; // Declarando variável do tipo inteiro para armazenar a posição dos contatos no array
@@ -22,14 +22,14 @@ int main(){ // Função principal
     int opcao; // Declarando variável do tipo inteiro para a escolha da opção do menu
     do{ // Início do loop do menu de opções até que o usuário escolha a opção de sair
         printf("\nMenu principal\n"); // Imprimindo o menu de opções
-        printf("1) Novo Cliente\n");// Imprimindo a primeira opção
-        printf("2) Deletar cliente \n"); // Imprimindo a segunda opção
-        printf("3) Listar cliente\n"); // Imprimindo a terceira opção
-        printf("4) Débito\n"); // Imprimindo a quarta opção
-        printf("5) Depósito\n"); // Imprimindo a quinta opção
-        printf("6) Extrato\n"); // Imprimindo a sexta opção
-        printf("7) Transferência entre contas\n"); // Imprimindo a setima opção
-        printf("0) Sair\n"); // Imprimindo a última opção
+        printf("1. Novo Cliente\n");// Imprimindo a primeira opção
+        printf("2. Deletar cliente \n"); // Imprimindo a segunda opção
+        printf("3. Listar cliente\n"); // Imprimindo a terceira opção
+        printf("4. Débito\n"); // Imprimindo a quarta opção
+        printf("5. Depósito\n"); // Imprimindo a quinta opção
+        printf("6. Extrato\n"); // Imprimindo a sexta opção
+        printf("7. Transferência entre contas\n"); // Imprimindo a setima opção
+        printf("0. Sair\n"); // Imprimindo a última opção
         printf("Escolha uma opção: "); // Pedindo ao usuário para escolher uma opção
         scanf("%d", &opcao); // Lendo a opção escolhida pelo usuário
 
