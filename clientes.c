@@ -21,7 +21,7 @@ ERRO criar(Banco clientes[], int *pos) {
     }
     clearBuffer(); // Chamando a função clearBuffer para limpar o buffer do teclado
 
-    printf("Digite o tipo de conta: "); // Pedindo para o usuário nos informar o tipo de conta solicitado
+    printf("Digite o tipo de conta:\n"); // Pedindo para o usuário nos informar o tipo de conta solicitado
     printf("Digite 1 para Conta Comum\n");
     printf("Digite 2 para Conta Plus\n");
     if (scanf("%d", &clientes[*pos].conta) != 1) {
@@ -298,6 +298,22 @@ ERRO salvar(Banco clientes[], int *pos){
 } // Fechando função de salvar
 
 ERRO carregar(Banco clientes[], int *pos){ 
+    FILE *f = fopen("clientes.bin", "rb"); // Abrindo o arquivo binário para leitura
+  if(f == NULL) // Verificando se o arquivo foi aberto corretamente
+      return ABRIR; // Retornando código de erro
+
+  int qtd = fread(clientes, LIMITE_CLIENTES, sizeof(Banco), f); // Lendo os clientes do arquivo binário
+  if(qtd == 0) // Verificando se a leitura foi bem sucedida
+      return ESCREVER; // Retornando código de erro
+
+  qtd = fread(pos, 1, sizeof(int), f); // Lendo a posição atual dos clientes do arquivo binário
+  if(qtd == 0) // Verificando se a leitura foi bem sucedida
+      return ESCREVER; // Retornando código de erro
+
+  if(fclose(f)) // Fechando o arquivo
+      return FECHAR; // Retornando código de erro
+
+  return OK; // Retornando código de sucesso
 } // Fechando função de carregar
 
 void clearBuffer(){ // Função de Limpar Buffer, para evitar o erro gerado ao tentar obter a entrada de informações do usuário
