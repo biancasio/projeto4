@@ -2,37 +2,84 @@
 #include <string.h> // Importa a biblioteca string.h para que possamos utilizar as funções de manipulação de strings
 #include "clientes.h" // Importa o arquivo tarefas.h para que possamos utilizar as funções declaradas nele
 
-ERRO criar(Banco clientes[], int *pos){ // Função de adicionar um novo cliente, recebe um array de contatos e um ponteiro para a posição atual dos clientes
-  if(*pos >= LIMITE_CLIENTES) // Verificando erro de limite de clientes atingido
-    return MAX_CLIENTES; // Retornando código de ultrapassou do limite de clientes
+ERRO criar(Banco clientes[], int *pos) {
+    if (*pos >= LIMITE_CLIENTES) { // Verificando erro de limite de clientes atingido
+        return MAX_CLIENTES; // Retornando código de ultrapassou do limite de clientes
+    }
 
-  clearBuffer(); // Chamando a função clearBuffer para limpar o buffer do teclado
-  printf("\nDigite Seu Nome: "); // Pedindo para o usuário nos informar o nome
-  fgets(clientes[*pos].nome, 100, stdin); // Lendo o nome digitado pelo usuário
-  clearBuffer(); // Chamando a função clearBuffer para limpar o buffer do teclado
+    clearBuffer(); // Chamando a função clearBuffer para limpar o buffer do teclado
 
-  printf("Digite o CPF: "); // Pedindo para o usuário nos informar seu cpf
-  scanf("%ld", &clientes[*pos].cpf); // Lendo o cpf digitado pelo usuário
-  clearBuffer(); // Chamando a função clearBuffer para limpar o buffer do teclado
+    printf("\nDigite Seu Nome: "); // Pedindo para o usuário nos informar o nome
+    fgets(clientes[*pos].nome, 100, stdin); // Lendo o nome digitado pelo usuário
+    clearBuffer(); // Chamando a função clearBuffer para limpar o buffer do teclado
 
-  printf("Tipo de Conta:\n");
-  printf("Digite 1 para Conta Comum\n");
-  printf("Digite 2 para Conta Plus\n"); // Pedindo para o usuário nos informar o tipo de conta solicitado
-  scanf("%d", &clientes[*pos].conta); // Lendo a conta digitado pelo usuário
-  clearBuffer(); // Chamando a função clearBuffer para limpar o buffer do teclado
+    printf("Digite o CPF: "); // Pedindo para o usuário nos informar seu cpf
+    if (scanf("%ld", &clientes[*pos].cpf) != 1) {
+        printf("Entrada inválida! Por favor, insira um número.\n");
+        clearBuffer(); // Limpar buffer para evitar loops infinitos
+        return CLIENTES_NAO_ENCONTRADO;
+    }
+    clearBuffer(); // Chamando a função clearBuffer para limpar o buffer do teclado
 
-  printf("Digite o Valor Inicial: "); // Pedindo para o usuário nos informar o valor da conta
-  scanf("%f", &clientes[*pos].valor); // Lendo o valor digitado pelo usuário
-  clearBuffer(); // Chamando a função clearBuffer para limpar o buffer do teclado
+    printf("Digite o tipo de conta: "); // Pedindo para o usuário nos informar o tipo de conta solicitado
+    if (scanf("%d", &clientes[*pos].conta) != 1) {
+        printf("Entrada inválida! Por favor, insira um número.\n");
+        clearBuffer(); // Limpar buffer para evitar loops infinitos
+        return CLIENTES_NAO_ENCONTRADO;
+    }
 
-  printf("Digite a Senha: "); // Pedindo para o usuário nos informar a senha
-  fgets(clientes[*pos].senha, 20, stdin); // Lendo o telefone digitado pelo usuário
-  clearBuffer(); // Chamando a função clearBuffer para limpar o buffer do teclado
+    printf("Digite o Valor Inicial: "); // Pedindo para o usuário nos informar o valor da conta
+    if (scanf("%f", &clientes[*pos].valor) != 1) {
+        printf("Entrada inválida! Por favor, insira um número.\n");
+        clearBuffer(); // Limpar buffer para evitar loops infinitos
+        return CLIENTES_NAO_ENCONTRADO;
+    }
+    clearBuffer(); // Chamando a função clearBuffer para limpar o buffer do teclado
 
-  *pos = *pos + 1; // Incrementando a posição para o próximo contato
+    printf("Digite a Senha: "); // Pedindo para o usuário nos informar a senha
+    fgets(clientes[*pos].senha, 20, stdin); // Lendo a senha digitada pelo usuário
+    clearBuffer(); // Chamando a função clearBuffer para limpar o buffer do teclado
 
-  return OK; // Retornando código de sucesso na execução
-} // Fechando função de adicionar contato
+    *pos = *pos + 1; // Incrementando a posição para o próximo contato
+
+    printf("Cliente criado com sucesso.\n"); // Mensagem de sucesso
+
+    return OK; // Retornando código de sucesso na execução
+}
+
+ERRO deletar(Banco clientes[], int *pos) {
+    if (*pos == 0) {
+        return SEM_CLIENTES;
+    }
+
+    long int cpf;
+    printf("Digite o CPF do cliente a ser deletado: ");
+    if (scanf("%ld", &cpf) != 1) {
+        printf("Entrada inválida!\n");
+        clearBuffer(); // Limpar buffer em caso de entrada inválida
+        return CLIENTES_NAO_ENCONTRADO;
+    }
+
+    int encontrado = 0;
+    for (int i = 0; i < *pos; i++) {
+        if (clientes[i].cpf == cpf) {
+            encontrado = 1;
+            // Deslocar todos os elementos seguintes para a esquerda
+            for (int j = i; j < *pos - 1; j++) {
+                clientes[j] = clientes[j + 1];
+            }
+            (*pos)--;
+            printf("Cliente deletado com sucesso.\n"); // Mensagem de sucesso
+            break;
+        }
+    }
+
+    if (!encontrado) {
+        return CLIENTES_NAO_ENCONTRADO;
+    }
+
+    return OK;
+}
 
 ERRO listar(Banco clientes[], int *pos){ // Função de listar contatos, recebe um array de contatos e um ponteiro para a posição atual dos contatos
   if(*pos == 0)  // Verificando erro de nenhum contato foi criado para ser possível listar
@@ -56,11 +103,9 @@ ERRO listar(Banco clientes[], int *pos){ // Função de listar contatos, recebe 
   return OK; // Retornando código de sucesso na execução
 } // Fechando função de listar contatos]
 
-ERRO deletar(Banco clientes[], int *pos){ 
-} // Fechando função de listar contatos
 
 ERRO debitar(Banco clientes[], int *pos){ 
-  int cpf_debito; // Declarando variavel para armazenar o cpf do cliente que deseja debitar
+  long int cpf_debito; // Declarando variavel para armazenar o cpf do cliente que deseja debitar
   char senha_debito[10]; // Declarando variavel para armazenar a senha do cliente que deseja debitar
   float valor_debito; // Declarando variavel para armazenar o valor que deseja debitar
   float taxa; // Declarando variavel para armazenar a taxa de debito
@@ -69,7 +114,7 @@ ERRO debitar(Banco clientes[], int *pos){
 
   clearBuffer(); // Limpando o Buffer do teclado
   printf("CPF: "); // Pedindo para o usuário nos informar o cpf
-  scanf("%d", &cpf_debito); // Lendo o cpf digitado pelo usuário
+  scanf("%ld", &cpf_debito); // Lendo o cpf digitado pelo usuário
   clearBuffer(); // Limpando o Buffer do teclado
 
   printf("Senha: "); // Pedindo para o usuário nos informar a senha
@@ -110,7 +155,7 @@ ERRO debitar(Banco clientes[], int *pos){
           }
         }
       }
-        
+
   if (cpf_existe != 1) // Verificando se o cpf existe
   { // Caso o cpf não exista
       printf("Senha ou CPF incorreto\n"); // Exibindo mensagem de erro para o usuário
@@ -124,13 +169,13 @@ ERRO extrato(Banco clientes[], int *pos){
 } // Fechando função de extrato
 
 ERRO depositar(Banco clientes[], int *pos){ 
-  int cpf_deposito; // Declarando variavel para armazenar o cpf do cliente que deseja depositar
+  long int cpf_deposito; // Declarando variavel para armazenar o cpf do cliente que deseja depositar
   float valor_deposito; // Declarando variavel para armazenar o valor que deseja depositar
   int cpf_existe = 0; // Declarando variavel para verificar se o cpf existe
 
   clearBuffer(); // Limpando o Buffer do teclado
   printf("CPF: "); // Pedindo para o usuário nos informar o cpf
-  scanf("%d", &cpf_deposito); // Lendo o cpf digitado pelo usuário
+  scanf("%ld", &cpf_deposito); // Lendo o cpf digitado pelo usuário
   clearBuffer(); // Limpando o Buffer do teclado
 
   printf("Valor a ser depositado: "); // Pedindo para o usuário nos informar o valor a ser depositado
@@ -153,13 +198,13 @@ ERRO depositar(Banco clientes[], int *pos){
   }
 
   return OK; // Retornando código de sucesso
-  
+
 } // Fechando função de depositar
 
 ERRO transferir(Banco clientes[], int *pos){ 
-  int cpf_origem; // Declarando variavel para armazenar o cpf do cliente que deseja transferir
+  long int cpf_origem; // Declarando variavel para armazenar o cpf do cliente que deseja transferir
   char senha_origem[20]; // Declarando variavel para armazenar a senha do cliente que deseja transferir
-  int cpf_destino; // Declarando variavel para armazenar o cpf do cliente que receberá a transferência
+  long int cpf_destino; // Declarando variavel para armazenar o cpf do cliente que receberá a transferência
   float valor_transferencia; // Declarando variavel para armazenar o valor a ser transferido
   float taxa; // Declarando variavel para armazenar a taxa de transferência
   float limite; // Declarando variavel para armazenar o limite de transferência
@@ -167,7 +212,7 @@ ERRO transferir(Banco clientes[], int *pos){
 
   clearBuffer(); // Limpando o Buffer do teclado
   printf("Digite o CPF da conta de origem: "); // Pedindo para o usuário nos informar o cpf da conta de origem
-  scanf("%d", &cpf_origem); // Lendo o cpf da conta de origem digitado pelo usuário
+  scanf("%ld", &cpf_origem); // Lendo o cpf da conta de origem digitado pelo usuário
   clearBuffer(); // Limpando o Buffer do teclado
 
   printf("Digite a senha da conta de origem: "); // Pedindo para o usuário nos informar a senha da conta de origem
@@ -175,7 +220,7 @@ ERRO transferir(Banco clientes[], int *pos){
 
   clearBuffer(); // Limpando o Buffer do teclado 
   printf("Digite o CPF da conta de destino: "); // Pedindo para o usuário nos informar o cpf da conta de destino
-  scanf("%d", &cpf_destino); // Lendo o cpf da conta de destino digitado pelo usuário
+  scanf("%ld", &cpf_destino); // Lendo o cpf da conta de destino digitado pelo usuário
   clearBuffer(); // Limpando o Buffer do teclado
 
   printf("Digite o valor a ser transferido: "); // Pedindo para o usuário nos informar o valor a ser transferido
@@ -228,7 +273,7 @@ ERRO transferir(Banco clientes[], int *pos){
   }
 
   return OK; // Retornando código de sucesso
-  
+
 } // Fechando função de transferir
 
 ERRO salvar(Banco clientes[], int *pos){ 
