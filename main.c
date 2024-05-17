@@ -2,11 +2,24 @@
 #include "clientes.h"
 
 int main(){ // Função principal
-  funcao funcoes[] = {criar, deletar, listar, debitar, depositar, extrato, transferir}; // Definindo um array de funções que serão utilizadas no programa
 
-  Banco clientes[LIMITE_CLIENTES];  // Declarando um array de contatos (com limite de 255), onde cada contato possui uma estrutura com as informações de nome, sobrenome, email e telefone
-  int pos; // Declarando variável do tipo inteiro para armazenar a posição dos contatos no array
-
+    funcao funcoes[] = {criar, deletar, listar, debitar, depositar,extrato, transferir}; // Definindo um array de funções que serão utilizadas no programa
+    Banco clientes[LIMITE_CLIENTES]; 
+    int pos; // Declarando variável do tipo inteiro para armazenar a posição dos contatos no array
+ int opcao; // Declarando variável do tipo inteiro para a escolha da opção do menu
+    do{ // Início do loop do menu de opções até que o usuário escolha a opção de sair
+        printf("\nMenu principal\n"); // Imprimindo o menu de opções
+        printf("1) Novo Cliente\n"); // Imprimindo a primeira opção
+        printf("2) Deletar Cliente\n"); // Imprimindo a segunda opção
+        printf("3) Listar Cliente\n"); // Imprimindo a terceira opção
+        printf("4) Débito\n"); // Imprimindo a quarta opção
+        printf("5) Depósito\n"); // Imprimindo a quinta opção
+        printf("6) Extrato\n"); // Imprimindo a sexta opção
+        printf("7) Transferência entre contas\n"); // Imprimindo a sétima opção
+        printf("0) Sair\n"); // Imprimindo a última opção
+        printf("Escolha uma opção: "); // Pedindo ao usuário para escolher uma opção
+        scanf("%d", &opcao); // Lendo a opção escolhida 
+ 
   ERRO erro = funcoes[5](clientes, &pos); // funções que mostram os erros
     if (erro == ABRIR) {
         printf("Erro ao carregar o arquivo para abrir.\n"); //mensagem de erro
@@ -19,21 +32,13 @@ int main(){ // Função principal
         pos = 0;
     }
 
-    int opcao; // Declarando variável do tipo inteiro para a escolha da opção do menu
-    do{ // Início do loop do menu de opções até que o usuário escolha a opção de sair
-        printf("\nMenu principal\n"); // Imprimindo o menu de opções
-        printf("1. Novo Cliente\n");// Imprimindo a primeira opção
-        printf("2. Deletar cliente \n"); // Imprimindo a segunda opção
-        printf("3. Listar cliente\n"); // Imprimindo a terceira opção
-        printf("4. Débito\n"); // Imprimindo a quarta opção
-        printf("5. Depósito\n"); // Imprimindo a quinta opção
-        printf("6. Extrato\n"); // Imprimindo a sexta opção
-        printf("7. Transferência entre contas\n"); // Imprimindo a setima opção
-        printf("0. Sair\n"); // Imprimindo a última opção
-        printf("Escolha uma opção: "); // Pedindo ao usuário para escolher uma opção
-        scanf("%d", &opcao); // Lendo a opção escolhida pelo usuário
+            if(opcao > 5) // Verificando se a opção escolhida é válida
+                printf("Opção inválida\n"); // Informando para o usuário que a opção escolhida é inválida
+            else // Caso nenhuma das condições anteriores sejam verdadeiras, a opção escolhida é sair, portanto o programa se encerrará
+                printf("Sair...\n"); // Informando ao usuário que o programa foi encerrado
 
-        opcao--; // Decrementando a opção para acessar o índice do array de funções
+    } while(opcao >= 0); // Condição para que o loop continue até que o usuário escolha a opção de sair, quando isso acontecer o loop se encerra
+
             if (opcao < -1 || opcao > 4) { // Verificando se a opção escolhida é válida
              printf("Opção inválida\n"); // Informando para o usuário que a opção escolhida é inválida
         } else if (opcao == 0) { 
@@ -60,14 +65,7 @@ int main(){ // Função principal
         }
     } while (opcao != -1); // Condição para que o loop continue até que o usuário escolha a opção de sair, quando isso acontecer o loop se encerra
 
-    erro = funcoes[3](clientes, &pos);
-    if (erro == ABRIR) { // erros possiveis do arquivo binário
-        printf("Erro para abrir o arquivo ao salvar\n"); // mensagem de erro do arquivo
-    } else if (erro == FECHAR) {
-        printf("Erro para fechar o arquivo ao salvar\n"); // mensagem de erro do arquivo
-    } else if (erro == ESCREVER) {
-        printf("Erro ao escrever no arquivo ao salvar\n"); // mensagem de erro do arquivo
-    }
-
+   
     return 0;
+
 }
