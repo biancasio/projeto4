@@ -2,7 +2,6 @@
 #include <string.h> // Importa a biblioteca string.h para que possamos utilizar as funções de manipulação de strings
 #include "clientes.h" // Importa o arquivo tarefas.h para que possamos utilizar as funções declaradas nele
 
-
 ERRO criar(Banco clientes[], int *pos){ // Função de adicionar um novo cliente, recebe um array de contatos e um ponteiro para a posição atual dos clientes
   if(*pos >= LIMITE_CLIENTES) // Verificando erro de limite de clientes atingido
     return MAX_CLIENTES; // Retornando código de ultrapassou do limite de clientes
@@ -125,6 +124,36 @@ ERRO extrato(Banco clientes[], int *pos){
 } // Fechando função de extrato
 
 ERRO depositar(Banco clientes[], int *pos){ 
+  int cpf_deposito; // Declarando variavel para armazenar o cpf do cliente que deseja depositar
+  float valor_deposito; // Declarando variavel para armazenar o valor que deseja depositar
+  int cpf_existe = 0; // Declarando variavel para verificar se o cpf existe
+
+  clearBuffer(); // Limpando o Buffer do teclado
+  printf("CPF: "); // Pedindo para o usuário nos informar o cpf
+  scanf("%d", &cpf_deposito); // Lendo o cpf digitado pelo usuário
+  clearBuffer(); // Limpando o Buffer do teclado
+
+  printf("Valor a ser depositado: "); // Pedindo para o usuário nos informar o valor a ser depositado
+  scanf("%f", &valor_deposito); // Lendo o valor digitado pelo usuário
+  clearBuffer(); // Limpando o Buffer do teclado
+
+  for (int i = 0; i < *pos; i++) { // Loop para percorrer todos os clientes
+      if (cpf_deposito == clientes[i].cpf) // Verificando se a senha e o cpf são válidos
+      {
+          cpf_existe = 1; // Atualizando a variável cpf_existe para indicar que o cpf existe
+          clientes[i].valor += valor_deposito; // Atualizando o saldo do cliente com o valor depositado
+          printf("Depósito realizado com sucesso!\n"); // Exibindo mensagem de sucesso para o usuário
+      }
+  }
+
+  if (cpf_existe != 1) // Verificando se o cpf existe
+  {
+      printf("CPF incorreto\n"); // Exibindo mensagem de erro para o usuário
+      return CPF_OU_SENHA_INCORRETO; // Retornando código de erro
+  }
+
+  return OK; // Retornando código de sucesso
+  
 } // Fechando função de depositar
 
 ERRO transferir(Banco clientes[], int *pos){ 
