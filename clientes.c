@@ -2,36 +2,86 @@
 #include <string.h> // Importa a biblioteca string.h para que possamos utilizar as funções de manipulação de strings
 #include "clientes.h" // Importa o arquivo tarefas.h para que possamos utilizar as funções declaradas nele
 
-ERRO criar(Banco clientes[], int *pos){ // Função de adicionar cliente, recebe um array de contatos e um ponteiro para a posição atual dos clientes
-  if(*pos >= LIMITE_CLIENTES) // Verificando erro de limite de clientes atingido
-    return MAX_CLIENTES; // Retornando código de ultrapassou do limite de clientes
 
-  clearBuffer(); // Chamando a função clearBuffer para limpar o buffer do teclado
-  printf("\nDigite Seu Nome: "); // Pedindo para o usuário nos informar o nome
-  fgets(clientes[*pos].nome, 100, stdin); // Lendo o nome digitado pelo usuário
-  clearBuffer(); // Chamando a função clearBuffer para limpar o buffer do teclado
+ERRO criar(Banco clientes[], int *pos) {
+    if (*pos >= LIMITE_CLIENTES) { // Verificando erro de limite de clientes atingido
+        return MAX_CLIENTES; // Retornando código de ultrapassou do limite de clientes
+    }
 
-  printf("Digite o CPF: "); // Pedindo para o usuário nos informar seu cpf
-  scanf("%ld", &clientes[*pos].cpf); // Lendo o cpf digitado pelo usuário
-  clearBuffer(); // Chamando a função clearBuffer para limpar o buffer do teclado
+    clearBuffer(); // Chamando a função clearBuffer para limpar o buffer do teclado
 
-  printf("Digite o tipo de conta: "); // Pedindo para o usuário nos informar o tipo de conta solicitado
-  fgets(clientes[*pos].conta, 5, stdin); // Lendo a conta digitado pelo usuário
-  clearBuffer(); // Chamando a função clearBuffer para limpar o buffer do teclado
+    printf("\nDigite Seu Nome: "); // Pedindo para o usuário nos informar o nome
+    fgets(clientes[*pos].nome, 100, stdin); // Lendo o nome digitado pelo usuário
+    clearBuffer(); // Chamando a função clearBuffer para limpar o buffer do teclado
 
-  printf("Digite o Valor Inicial: "); // Pedindo para o usuário nos informar o valor da conta
-  scanf("%ld", &clientes[*pos].valor); // Lendo o valor digitado pelo usuário
-  clearBuffer(); // Chamando a função clearBuffer para limpar o buffer do teclado
+    printf("Digite o CPF: "); // Pedindo para o usuário nos informar seu cpf
+    if (scanf("%ld", &clientes[*pos].cpf) != 1) {
+        printf("Entrada inválida! Por favor, insira um número.\n");
+        clearBuffer(); // Limpar buffer para evitar loops infinitos
+        return CLIENTES_NAO_ENCONTRADO;
+    }
+    clearBuffer(); // Chamando a função clearBuffer para limpar o buffer do teclado
 
-  printf("Digite a Senha: "); // Pedindo para o usuário nos informar a senha
-  scanf("%ld", &clientes[*pos].senha); // Lendo o telefone digitado pelo usuário
-  clearBuffer(); // Chamando a função clearBuffer para limpar o buffer do teclado
+    printf("Digite o tipo de conta: "); // Pedindo para o usuário nos informar o tipo de conta solicitado
+    fgets(clientes[*pos].conta, 5, stdin); // Lendo a conta digitada pelo usuário
+    clearBuffer(); // Chamando a função clearBuffer para limpar o buffer do teclado
 
-  *pos = *pos + 1; // Incrementando a posição para o próximo contato
+    printf("Digite o Valor Inicial: "); // Pedindo para o usuário nos informar o valor da conta
+    if (scanf("%ld", &clientes[*pos].valor) != 1) {
+        printf("Entrada inválida! Por favor, insira um número.\n");
+        clearBuffer(); // Limpar buffer para evitar loops infinitos
+        return CLIENTES_NAO_ENCONTRADO;
+    }
+    clearBuffer(); // Chamando a função clearBuffer para limpar o buffer do teclado
 
-  return OK; // Retornando código de sucesso na execução
-} // Fechando função de adicionar contato
+    printf("Digite a Senha: "); // Pedindo para o usuário nos informar a senha
+    if (scanf("%ld", &clientes[*pos].senha) != 1) {
+        printf("Entrada inválida! Por favor, insira um número.\n");
+        clearBuffer(); // Limpar buffer para evitar loops infinitos
+        return CLIENTES_NAO_ENCONTRADO;
+    }
+    clearBuffer(); // Chamando a função clearBuffer para limpar o buffer do teclado
 
+    *pos = *pos + 1; // Incrementando a posição para o próximo contato
+
+    printf("Cliente criado com sucesso.\n"); // Mensagem de sucesso
+
+    return OK; // Retornando código de sucesso na execução
+}
+
+ERRO deletar(Banco clientes[], int *pos) {
+    if (*pos == 0) {
+        return SEM_CLIENTES;
+    }
+
+    long int cpf;
+    printf("Digite o CPF do cliente a ser deletado: ");
+    if (scanf("%ld", &cpf) != 1) {
+        printf("Entrada inválida!\n");
+        clearBuffer(); // Limpar buffer em caso de entrada inválida
+        return CLIENTES_NAO_ENCONTRADO;
+    }
+
+    int encontrado = 0;
+    for (int i = 0; i < *pos; i++) {
+        if (clientes[i].cpf == cpf) {
+            encontrado = 1;
+            // Deslocar todos os elementos seguintes para a esquerda
+            for (int j = i; j < *pos - 1; j++) {
+                clientes[j] = clientes[j + 1];
+            }
+            (*pos)--;
+            printf("Cliente deletado com sucesso.\n"); // Mensagem de sucesso
+            break;
+        }
+    }
+
+    if (!encontrado) {
+        return CLIENTES_NAO_ENCONTRADO;
+    }
+
+    return OK;
+}
 ERRO listar(Banco clientes[], int *pos){ // Função de listar contatos, recebe um array de contatos e um ponteiro para a posição atual dos contatos
   if(*pos == 0)  // Verificando erro de nenhum contato foi criado para ser possível listar
     return SEM_CLIENTES; // Retornando código de nenhum contato para listar
@@ -47,8 +97,6 @@ ERRO listar(Banco clientes[], int *pos){ // Função de listar contatos, recebe 
   return OK; // Retornando código de sucesso na execução
 } // Fechando função de listar contatos]
 
-ERRO deletar(Banco clientes[], int *pos){ 
-} // Fechando função de listar contatos
 
 ERRO debitar(Banco clientes[], int *pos){ 
 } // Fechando função de listar contatos

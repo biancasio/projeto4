@@ -1,71 +1,73 @@
-#include <stdio.h> // Importa a biblioteca stdio.h para que possamos utilizar as funções de entrada e saída padrão de dados
+#include <stdio.h>
 #include "clientes.h"
 
-int main(){ // Função principal
+int main() {
+    funcao funcoes[] = {NULL, criar, deletar, listar, debitar, depositar, extrato, transferir}; // Ajustando o mapeamento
+    Banco clientes[LIMITE_CLIENTES];
+    int pos = 0; // Inicializando a posição dos clientes
+    int opcao;
 
-    funcao funcoes[] = {criar, deletar, listar, debitar, depositar,extrato, transferir}; // Definindo um array de funções que serão utilizadas no programa
-    Banco clientes[LIMITE_CLIENTES]; 
-    int pos; // Declarando variável do tipo inteiro para armazenar a posição dos contatos no array
- int opcao; // Declarando variável do tipo inteiro para a escolha da opção do menu
-    do{ // Início do loop do menu de opções até que o usuário escolha a opção de sair
-        printf("\nMenu principal\n"); // Imprimindo o menu de opções
-        printf("1) Novo Cliente\n"); // Imprimindo a primeira opção
-        printf("2) Deletar Cliente\n"); // Imprimindo a segunda opção
-        printf("3) Listar Cliente\n"); // Imprimindo a terceira opção
-        printf("4) Débito\n"); // Imprimindo a quarta opção
-        printf("5) Depósito\n"); // Imprimindo a quinta opção
-        printf("6) Extrato\n"); // Imprimindo a sexta opção
-        printf("7) Transferência entre contas\n"); // Imprimindo a sétima opção
-        printf("0) Sair\n"); // Imprimindo a última opção
-        printf("Escolha uma opção: "); // Pedindo ao usuário para escolher uma opção
-        scanf("%d", &opcao); // Lendo a opção escolhida 
- 
-  ERRO erro = funcoes[5](clientes, &pos); // funções que mostram os erros
+    ERRO erro = carregar(clientes, &pos);
     if (erro == ABRIR) {
-        printf("Erro ao carregar o arquivo para abrir.\n"); //mensagem de erro
+        printf("Erro ao carregar o arquivo para abrir.\n");
         pos = 0;
     } else if (erro == FECHAR) {
-        printf("Erro ao carregar o arquivo para fechar.\n"); // mensagem de erro
+        printf("Erro ao carregar o arquivo para fechar.\n");
         pos = 0;
     } else if (erro == LER) {
-        printf("Erro ao carregar o arquivo para ler.\n"); // mensagem de erro
+        printf("Erro ao carregar o arquivo para ler.\n");
         pos = 0;
     }
 
-            if(opcao > 5) // Verificando se a opção escolhida é válida
-                printf("Opção inválida\n"); // Informando para o usuário que a opção escolhida é inválida
-            else // Caso nenhuma das condições anteriores sejam verdadeiras, a opção escolhida é sair, portanto o programa se encerrará
-                printf("Sair...\n"); // Informando ao usuário que o programa foi encerrado
-
-    } while(opcao >= 0); // Condição para que o loop continue até que o usuário escolha a opção de sair, quando isso acontecer o loop se encerra
-
-            if (opcao < -1 || opcao > 4) { // Verificando se a opção escolhida é válida
-             printf("Opção inválida\n"); // Informando para o usuário que a opção escolhida é inválida
-        } else if (opcao == 0) { 
-            erro = funcoes[opcao](clientes, &pos); 
-            if (erro == MAX_CLIENTES) {
-              printf("Máximo de clientes alcançados\n"); // se a posição for igual a máxima de contatos mostra erro
-            }
-        } else if (opcao == 1) {
-            erro = funcoes[opcao](clientes, &pos);
-            if (erro == SEM_CLIENTES) { // se não possuir contatos para deletar mostrar 
-                printf("Sem clientes para deletar\n"); // mensagem de erro
-            } else if (erro == CLIENTES_NAO_ENCONTRADO) { // se o contato não for encontrado
-                printf("cliente não existe\n"); // mensagem de erro
-            }
-        } else if (opcao == 2) { // se a opção for igual a 2
-            erro = funcoes[opcao](clientes, &pos); // mostrar erro
-            if (erro == CLIENTES_NAO_ENCONTRADO) {
-                printf("Sem clientes para listar\n"); // mensagem de erro
-            }
-        } else if (opcao == 3 || opcao == 4) {
-            funcoes[opcao](clientes, &pos);
-        } else {
-            printf("Sair...\n"); // Informando ao usuário que o programa foi encerrado
+    do {
+        printf("\nMenu principal\n");
+        printf("1) Novo Cliente\n");
+        printf("2) Deletar Cliente\n");
+        printf("3) Listar Cliente\n");
+        printf("4) Débito\n");
+        printf("5) Depósito\n");
+        printf("6) Extrato\n");
+        printf("7) Transferência entre contas\n");
+        printf("0) Sair\n");
+        printf("Escolha uma opção: ");
+        if (scanf("%d", &opcao) != 1) { // Adicionando verificação de entrada
+            printf("Entrada inválida! Por favor, insira um número.\n");
+            clearBuffer(); // Limpar buffer para evitar loops infinitos
+            continue;
         }
-    } while (opcao != -1); // Condição para que o loop continue até que o usuário escolha a opção de sair, quando isso acontecer o loop se encerra
 
-   
+        if (opcao >= 0 && opcao <= 7) {
+            if (funcoes[opcao] != NULL) {
+                erro = funcoes[opcao](clientes, &pos);
+                if (erro == MAX_CLIENTES) {
+                    printf("Máximo de clientes alcançados.\n");
+                } else if (erro == SEM_CLIENTES) {
+                    printf("Sem clientes cadastrados.\n");
+                } else if (erro == CLIENTES_NAO_ENCONTRADO) {
+                    printf("Cliente não encontrado.\n");
+                } else if (erro == ABRIR) {
+                    printf("Erro ao abrir o arquivo.\n");
+                } else if (erro == FECHAR) {
+                    printf("Erro ao fechar o arquivo.\n");
+                } else if (erro == LER) {
+                    printf("Erro ao ler o arquivo.\n");
+                } else if (erro == ESCREVER) {
+                    printf("Erro ao escrever no arquivo.\n");
+                }
+            }
+        } else {
+            printf("Opção inválida\n");
+            clearBuffer(); // Limpar buffer se a entrada for inválida
+        }
+    } while (opcao != 0);
+
+    erro = salvar(clientes, &pos);
+    if (erro == ABRIR) {
+        printf("Erro ao abrir o arquivo para salvar.\n");
+    } else if (erro == FECHAR) {
+        printf("Erro ao fechar o arquivo após salvar.\n");
+    }
+    
+
     return 0;
-
 }
