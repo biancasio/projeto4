@@ -1,11 +1,15 @@
 #include <stdio.h> // Importa a biblioteca stdio.h para que possamos utilizar as funções de entrada e saída padrão de dados
-#include "clientes.h"
+#include "clientes.h" // Importa o arquivo tarefas.h para que possamos utilizar as funções declaradas nele
 
 int main(){ // Função principal
 
-    funcao funcoes[] = {criar, deletar, listar, debitar, depositar,extrato, transferir}; // Definindo um array de funções que serão utilizadas no programa
-    Banco clientes[LIMITE_CLIENTES]; 
-    int pos; // Declarando variável do tipo inteiro para armazenar a posição dos contatos no array
+  funcao funcoes[] = {criar, deletar, listar, debitar, depositar, extrato, transferir, salvar, carregar}; // Definindo um array de funções que serão utilizadas no programa
+
+  Banco clientes[LIMITE_CLIENTES];  // Declarando um array de clientes (com limite de 1000), onde cada cliente possui uma estrutura com as informações de nome, cpf, tipo de conta, valor e senha
+  int pos; // Declarando variável do tipo inteiro para armazenar a posição dos clientes no array
+
+  ERRO erro = funcoes[8](clientes, &pos); // funções que mostram os erros
+
  int opcao; // Declarando variável do tipo inteiro para a escolha da opção do menu
     do{ // Início do loop do menu de opções até que o usuário escolha a opção de sair
         printf("\nMenu principal\n"); // Imprimindo o menu de opções
@@ -20,7 +24,6 @@ int main(){ // Função principal
         printf("Escolha uma opção: "); // Pedindo ao usuário para escolher uma opção
         scanf("%d", &opcao); // Lendo a opção escolhida 
  
-  ERRO erro = funcoes[5](clientes, &pos); // funções que mostram os erros
     if (erro == ABRIR) {
         printf("Erro ao carregar o arquivo para abrir.\n"); //mensagem de erro
         pos = 0;
@@ -32,6 +35,9 @@ int main(){ // Função principal
         pos = 0;
     }
 
+        opcao--; // Decrementando a opção para acessar o índice do array de funções
+            if (opcao < -1 || opcao > 6) { // Verificando se a opção escolhida é válida
+
             if(opcao > 5) // Verificando se a opção escolhida é válida
                 printf("Opção inválida\n"); // Informando para o usuário que a opção escolhida é inválida
             else // Caso nenhuma das condições anteriores sejam verdadeiras, a opção escolhida é sair, portanto o programa se encerrará
@@ -40,6 +46,7 @@ int main(){ // Função principal
     } while(opcao >= 0); // Condição para que o loop continue até que o usuário escolha a opção de sair, quando isso acontecer o loop se encerra
 
             if (opcao < -1 || opcao > 4) { // Verificando se a opção escolhida é válida
+
              printf("Opção inválida\n"); // Informando para o usuário que a opção escolhida é inválida
         } else if (opcao == 0) { 
             erro = funcoes[opcao](clientes, &pos); 
@@ -58,14 +65,13 @@ int main(){ // Função principal
             if (erro == CLIENTES_NAO_ENCONTRADO) {
                 printf("Sem clientes para listar\n"); // mensagem de erro
             }
-        } else if (opcao == 3 || opcao == 4) {
+        } else if (opcao == 3 || opcao == 4 || opcao == 5 || opcao == 6) {
             funcoes[opcao](clientes, &pos);
         } else {
             printf("Sair...\n"); // Informando ao usuário que o programa foi encerrado
         }
     } while (opcao != -1); // Condição para que o loop continue até que o usuário escolha a opção de sair, quando isso acontecer o loop se encerra
 
-   
     return 0;
 
 }
