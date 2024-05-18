@@ -42,9 +42,28 @@ ERRO criar(Banco clientes[], int *pos) {
     fgets(clientes[*pos].senha, 20, stdin); // Lendo a senha digitada pelo usuário
     clearBuffer(); // Chamando a função clearBuffer para limpar o buffer do teclado
 
+    char nome_arquivo[50];
+    sprintf(nome_arquivo, "extrato_%ld.txt", clientes[*pos].cpf);
+    FILE *file = fopen(nome_arquivo, "w");
+    if (file == NULL) {
+        printf("Erro ao escrever o arquivo de extrato.\n");
+        return ESCREVER;
+    }
+
+    fprintf(file, "----------------------------------------------------------\n");
+    fprintf(file, "Extrato da Conta\n");
+    fprintf(file, "Nome: %s\n", clientes[*pos].nome);
+    fprintf(file, "CPF: %ld\n", clientes[*pos].cpf);
+    fprintf(file, "Tipo de Conta: %s\n", (clientes[*pos].conta == 1) ? "Comum" : "Plus");
+    fprintf(file, "Valor Atual: %.2f\n", clientes[*pos].valor);
+    fprintf(file, "----------------------------------------------------------\n\n");
+
+    fclose(file);
+
     *pos = *pos + 1; // Incrementando a posição para o próximo contato
 
     printf("Cliente criado com sucesso.\n"); // Mensagem de sucesso
+
 
     return OK; // Retornando código de sucesso na execução
 }
@@ -99,7 +118,7 @@ ERRO listar(Banco clientes[], int *pos){ // Função de listar contatos, recebe 
     {
       printf("Tipo de Conta: Plus\t"); // Imprimindo o tipo de conta do cliente
     }
-    printf("Valor Inicial: %f\n", clientes[i].valor); // Imprimindo o valor da conta
+    printf("Valor Inicial: %2.f\n", clientes[i].valor); // Imprimindo o valor da conta
   }  // Fechando for para listar contatos
 
   return OK; // Retornando código de sucesso na execução
@@ -151,6 +170,29 @@ ERRO debitar(Banco clientes[], int *pos){
               clientes[i].valor -= (valor_debito * taxa) + valor_debito; // Atualizando o saldo do cliente com o valor debitado e a taxa de debito
               printf("Débito realizado com sucesso!\n"); // Exibindo mensagem de sucesso para o usuário
 
+              taxa = (valor_debito * taxa);
+              char nome_arquivo[50];
+              sprintf(nome_arquivo, "extrato_%ld.txt", clientes[i].cpf);
+              FILE *file = fopen(nome_arquivo, "a");
+              if (file == NULL) {
+                  printf("Erro ao criar o arquivo de extrato.\n");
+                  return ESCREVER;
+              }
+
+              fprintf(file, "----------------------------------------------------------\n");
+              fprintf(file, "Extrato da Conta\n");
+              fprintf(file, "Nome: %s\n", clientes[i].nome);
+              fprintf(file, "CPF: %ld\n", clientes[i].cpf);
+              fprintf(file, "Tipo de Conta: %s\n", (clientes[i].conta == 1) ? "Comum" : "Plus");
+              fprintf(file, "Valor Atual: %.2f\n", clientes[i].valor);
+              fprintf(file, "\nHistórico de Operações:\n");
+              fprintf(file, "Débito: - %.2f \n", valor_debito);
+              fprintf(file, "Taxa: - %.2f \n", taxa);
+              fprintf(file, "----------------------------------------------------------\n\n");
+
+              fclose(file);
+              
+
           }
           else { // Caso o saldo não seja suficiente para realizar o débito
               printf("Saldo insuficiente para o débito.\n"); // Exibindo mensagem de erro para o usuário
@@ -166,9 +208,48 @@ ERRO debitar(Banco clientes[], int *pos){
 
   return OK; // Retornando código de sucesso
 } // Fechando função de debito
+ERRO extrato(Banco clientes[], int *pos) {
+    long int cpf_extrato;
+    char senha_extrato[20];
+    int cpf_existe = 0;
 
-ERRO extrato(Banco clientes[], int *pos){ 
-} // Fechando função de extrato
+    clearBuffer();
+    printf("CPF: ");
+    if (scanf("%ld", &cpf_extrato) != 1) {
+        printf("Entrada inválida! Por favor, insira um número.\n");
+        clearBuffer(); // Limpar buffer para evitar loops infinitos
+        return CLIENTES_NAO_ENCONTRADO;
+    }
+
+    clearBuffer();
+    printf("Senha: ");
+    fgets(senha_extrato, sizeof(senha_extrato), stdin);
+
+    // Remove caractere newline se presente
+    //senha_extrato[strcspn(senha_extrato, "\n")] = '\0'; // Remove o caractere de nova linha
+
+    for (int i = 0; i < *pos; i++) {
+        if (clientes[i].cpf == cpf_extrato && strcmp(clientes[i].senha, senha_extrato) == 0) {
+            int cpf_existe = 0;
+
+            char nome_arquivo[50];
+            sprintf(nome_arquivo, "extrato_%ld.txt", clientes[i].cpf);
+            FILE *file = fopen(nome_arquivo, "r");
+            if (file == NULL) {
+                printf("Erro ao ler o arquivo de extrato.\n");
+                return LER;
+            }
+
+            fclose(file);
+            printf("Extrato gerado com sucesso! Arquivo: %s\n", nome_arquivo);
+            return OK;
+        }
+    }
+
+    printf("Senha ou CPF incorreto\n"); // Movido para fora do loop
+    return CPF_OU_SENHA_INCORRETO; // Movido para fora do loop
+}
+
 
 ERRO depositar(Banco clientes[], int *pos){ 
   long int cpf_deposito; // Declarando variavel para armazenar o cpf do cliente que deseja depositar
@@ -190,6 +271,27 @@ ERRO depositar(Banco clientes[], int *pos){
           cpf_existe = 1; // Atualizando a variável cpf_existe para indicar que o cpf existe
           clientes[i].valor += valor_deposito; // Atualizando o saldo do cliente com o valor depositado
           printf("Depósito realizado com sucesso!\n"); // Exibindo mensagem de sucesso para o usuário
+
+          char nome_arquivo[50];
+          sprintf(nome_arquivo, "extrato_%ld.txt", clientes[i].cpf);
+          FILE *file = fopen(nome_arquivo, "a");
+          if (file == NULL) {
+              printf("Erro ao criar o arquivo de extrato.\n");
+              return ESCREVER;
+          }
+
+          fprintf(file, "----------------------------------------------------------\n");
+          fprintf(file, "Extrato da Conta\n");
+          fprintf(file, "Nome: %s\n", clientes[i].nome);
+          fprintf(file, "CPF: %ld\n", clientes[i].cpf);
+          fprintf(file, "Tipo de Conta: %s\n", (clientes[i].conta == 1) ? "Comum" : "Plus");
+          fprintf(file, "Valor Atual: %.2f\n", clientes[i].valor);
+          fprintf(file, "\nHistórico de Operações:\n");
+          fprintf(file, "Deposito: + %.2f \n", valor_deposito);
+          fprintf(file, "Taxa: 0 \n\n");
+          fprintf(file, "----------------------------------------------------------\n\n");
+
+          fclose(file);
       }
   }
 
@@ -259,6 +361,52 @@ ERRO transferir(Banco clientes[], int *pos){
                       clientes[i].valor -= (valor_transferencia * taxa) + valor_transferencia; // Atualizando o saldo do cliente com o valor debitado e a taxa de debito
                       clientes[j].valor += valor_transferencia; // Atualizando o saldo do cliente com o valor depositado
                       printf("Transferência realizada com sucesso!\n"); // Exibindo mensagem de sucesso para o usuário
+
+                      taxa = (valor_transferencia * taxa);
+                      char nome_arquivo_transferido[50];
+                      sprintf(nome_arquivo_transferido, "extrato_%ld.txt", clientes[i].cpf);
+                      FILE *file = fopen(nome_arquivo_transferido, "a");
+                      if (file == NULL) {
+                          printf("Erro ao criar o arquivo de extrato.\n");
+                          return ESCREVER;
+                      }
+
+                      fprintf(file, "----------------------------------------------------------\n");
+                      fprintf(file, "Extrato da Conta\n");
+                      fprintf(file, "Nome: %s\n", clientes[i].nome);
+                      fprintf(file, "CPF: %ld\n", clientes[i].cpf);
+                      fprintf(file, "Tipo de Conta: %s\n", (clientes[i].conta == 1) ? "Comum" : "Plus");
+                      fprintf(file, "Valor Atual: %.2f\n", clientes[i].valor);
+                      fprintf(file, "\nHistórico de Operações:\n");
+                      fprintf(file, "Tranferência: - %.2f \n", valor_transferencia);
+                      fprintf(file, "Taxa: - %.2f \n\n", taxa);
+                      fprintf(file, "----------------------------------------------------------\n\n");
+
+                      fclose(file);
+
+                      
+                      char nome_arquivo_recebido[50];
+                      sprintf(nome_arquivo_recebido, "extrato_%ld.txt", clientes[j].cpf);
+                      FILE *file1 = fopen(nome_arquivo_recebido, "a");
+                      if (file1 == NULL) {
+                          printf("Erro ao criar o arquivo de extrato.\n");
+                          return ESCREVER;
+                      }
+      
+                      fprintf(file1, "----------------------------------------------------------\n");
+                      fprintf(file1, "Extrato da Conta\n");
+                      fprintf(file1, "Nome: %s\n", clientes[j].nome);
+                      fprintf(file1, "CPF: %ld\n", clientes[j].cpf);
+                      fprintf(file1, "Tipo de Conta: %s\n", (clientes[j].conta == 1) ? "Comum" : "Plus");
+                      fprintf(file1, "Valor Atual: %.2f\n", clientes[j].valor);
+                      fprintf(file1, "\nHistórico de Operações:\n");
+                      fprintf(file1, "Tranferência: + %.2f \n", valor_transferencia);
+                      fprintf(file1, "Taxa: 0 \n\n");
+                      fprintf(file1, "----------------------------------------------------------\n\n");
+
+                      fclose(file1);
+                      
+
                   } else { // Caso o saldo não seja suficiente para realizar o débito
                       printf("Saldo insuficiente para o débito.\n"); // Exibindo mensagem de erro para o usuário
                   }
